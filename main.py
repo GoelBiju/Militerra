@@ -7,8 +7,8 @@ app = FastAPI()
 # replace this with the root url for your app,
 # http://127.0.0.1:8000 if you're doing it locally or
 # use ngrok to generate a link like the one below :)
-# base_url = 'https://b1eb-2a0c-5bc0-40-3e3c-6139-5a2e-701e-33ee.ngrok-free.app'
-base_url = "http://127.0.0.1:8000"
+base_url = 'https://fd82-2a0c-5bc0-40-3e3a-f866-b6b3-8188-5317.ngrok-free.app'
+# base_url = "http://127.0.0.1:8000"
 
 
 dev_id = 'militerra-testing-Zbf5Rx4BcZ'
@@ -77,6 +77,8 @@ async def consume(request: Request):
     # you can now do whatever you want with the data
     # checkout https://docs.tryterra.co/reference/v2
     # to see what the data would look like.
+
+    print(data)
 
     return { 'success': 'ok' }
 
