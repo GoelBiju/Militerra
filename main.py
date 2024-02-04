@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
+import httpx
 import requests
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -27,16 +28,16 @@ app.add_middleware(
 NOMINATIM_API_URL = "https://nominatim.openstreetmap.org/search"
 
 
-
-@app.get("/geocode")
-def geocode(q: str):
-    params = {
-        "q": q,
-        "format": "json"
-    }
-    response = requests.get(NOMINATIM_API_URL, params=params)
-    return response.json()
-
+@app.get("/soldiers")
+async def get_soldiers():
+    # Assuming 'external_api_url' is the URL where you fetch soldier data from
+    external_api_url = "https://fd82-2a0c-5bc0-40-3e3a-f866-b6b3-8188-5317.ngrok-free.app/soldiers"
+    async with httpx.AsyncClient() as client:
+        response = await client.get(external_api_url)
+        # Perform error handling as necessary
+        if response.status_code != 200:
+            return JSONResponse(status_code=response.status_code, content={"message": "Failed to fetch soldiers"})
+        return response.json()
 
 @app.get('/login')
 async def auth():    
