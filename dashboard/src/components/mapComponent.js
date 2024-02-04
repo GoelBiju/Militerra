@@ -1,34 +1,80 @@
 import React, { useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
-// Fix the default marker icon issue in React Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-  iconUrl: require("leaflet/dist/images/marker-icon.png"),
-  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+// Define your custom icon
+const soldierIcon = new L.Icon({
+  iconUrl: "/soldier.jpeg",
+  iconSize: [38, 95], // Adjust based on your icon's size
+  shadowSize: [50, 64], // Adjust based on your shadow image's size, omit if not applicable
+  iconAnchor: [22, 94], // Adjust so the tip of the icon points to the exact location
+  shadowAnchor: [4, 62], // Adjust, omit if not applicable
+  popupAnchor: [-3, -76], // Adjust if you use popups
 });
 
-function MapComponent({ position }) {
+function DraggableMarker() {
+  // Set the initial position to the soldier's current location
+  const [position, setPosition] = useState([51.505, -0.09]); // Example coordinates
+
+  useMapEvents({
+    click(e) {
+      setPosition(e.latlng);
+    },
+  });
+
+  const markerRef = React.useRef(null);
+  const eventHandlers = React.useMemo(
+    () => ({
+      dragend() {
+        const marker = markerRef.current;
+        if (marker != null) {
+          setPosition(marker.getLatLng());
+        }
+      },
+    }),
+    []
+  );
+
+  return (
+    <Marker
+      draggable={true}
+      eventHandlers={eventHandlers}
+      position={position}
+      ref={markerRef}
+      icon={soldierIcon}
+    >
+      <Popup>You can move me</Popup>
+    </Marker>
+  );
+}
+
+function MapComponent({ initialPosition }) {
   return (
     <MapContainer
-      center={position}
+      center={initialPosition}
       zoom={13}
-      style={{ height: "500px", width: "100%" }}
+      style={{ height: "400px", width: "100%" }}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      <Marker position={position}>
-        <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
-        </Popup>
-      </Marker>
+      <DraggableMarker />
     </MapContainer>
   );
 }
 
-export default MapComponent;
+// Usage of MapComponent, providing the initial position as props
+export default function App() {
+  // Soldier's current location as the initial position
+  const soldierCurrentLocation = [51.505, -0.09]; // Replace with actual coordinates
+
+  return <MapComponent initialPosition={soldierCurrentLocation} />;
+}
