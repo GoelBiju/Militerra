@@ -3,9 +3,13 @@ from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 import requests
 from fastapi.middleware.cors import CORSMiddleware
+import time
+import random
 
 import threading
 import queue
+
+import random
 
 app = FastAPI()
 
@@ -100,6 +104,8 @@ async def auth_success(user_id: str, reference_id: str):
 # Try use ngrok to make it public and provider the url for
 # the webhook to our https://dashboard.tryterra.co/connections :)
 
+# https://dashboard.tryterra.co/api/tools/debug/users/data?type=activity&dev_id=militerra-testing-Zbf5Rx4BcZ&user_id=550e6fea-60ab-44d9-90f7-77414c8f1b40&start_date=2024-02-03&end_date=2024-02-04&to_webhook=false
+
 # Generic endpoint for TerraAPI consumption
 @app.post('/consume')
 async def consume(request: Request):
@@ -111,86 +117,82 @@ async def consume(request: Request):
 
     print("Adding to queue:", data)
     # need to pick out the right data...    
-    update_queue.put(data)
+    picked_data = {
+        "soldier": data["user"]["reference_id"],
+        "heart_rate": random.randint(70, 90),
+        "temperature": random.randint(24, 30),
+        "hydration": random.randint(500, 1500), # constant
+        "muscle_mass": random.randint(80, 90), # constant
+        "body_fat": random.randint(10, 20), # constant
+        "max_speed": random.randint(8, 10),
+        "sleep": random.randint(7, 12), # constant
+        "stress": random.randint(80, 90)
+    }
+    
+    print(picked_data)
+    update_queue.put(picked_data)
 
     return { 'success': 'updated soldier' } 
 
+class Soldier():
+    def __init__(self, name, mission_name, location, health, mission_commands, needs_support):
+        self.name = name
+        self.mission_name = mission_name
+        self.location = location
+        self.health = health
+        self.mission_commands = mission_commands
+        self.needs_support = needs_support
+        self.overall_score = 0
 
-soldiers_data = {
-    "soldier-1": {
-        "name": "Abraham Mathew",
-        "mission_name": "MiddleEast-2024-TRAIN",
-        "location": [51.877234, -3.435486],
-        "health": {
-            "overall_score": "N/A",
-            "heart_rate": "N/A",
-            "temperature": "N/A", # prevent against heat-stress/temp related issues
-            "overall_score": "N/A",
-            "hydration": "N/A",
-            "muscle_mass": "N/A",
-            "body_fat": "N/A",
-            "max_speed": "N/A",
-            "sleep": "N/A",
-            "stress": "N/A"
-        },
-        "mission_commands": [""],
-        "needs_support": False
-    },
-    "soldier-2": {
-        "name": "Kevin Thomas",
-        "mission_name": "MiddleEast-2024-TRAIN",
-        "location": [51.887223, -3.451453],
-        "health": {
-            "overall_score": "N/A",
-            "heart_rate": "N/A",
-            "temperature": "N/A", # prevent against heat-stress/temp related issues
-            "overall_score": "N/A",
-            "hydration": "N/A",
-            "muscle_mass": "N/A",
-            "body_fat": "N/A",
-            "max_speed": "N/A",
-            "sleep": "N/A",
-            "stress": "N/A"
-        },
-        "mission_commands": [""],
-        "needs_support": True
-    },
-    "john": {
-        "name": "John Yu",
-        "mission_name": "MiddleEast-2024-TRAIN",
-        "location": [51.887223, -3.42],
-        "health": {
-            "overall_score": "N/A",
-            "heart_rate": "N/A",
-            "temperature": "N/A", # prevent against heat-stress/temp related issues
-            "overall_score": "N/A",
-            "hydration": "N/A",
-            "muscle_mass": "N/A",
-            "body_fat": "N/A",
-            "max_speed": "N/A",
-            "sleep": "N/A",
-            "stress": "N/A"
-        },
-        "mission_commands": [""],
-        "needs_support": False
-    },
-}
+
+    def set_location(self, loc):
+        self.location = loc
+
+    def set_health(self, health):
+        self.health = health
+
+    def set_mission_commmands(self, mission_commands):
+        self.mission_commands = mission_commands
+
+    def needs_support(self, needs_support):
+        self.needs_support = needs_support
+
+
+    def calculate_overall_score(self):
+        max_score = 1548
+        return ((-4 * int(self.health["stress"]) +
+                2 * int(self.health["heart_rate"]) +
+                2 * int(self.health["muscle_mass"]) +
+                3 * int(self.health["max_speed"]) +
+                3 * int(self.health["body_fat"]) +
+                3 * int(self.health["temperature"]) +
+                1 * int(self.health["hydration"]) +
+                4 * int(self.health["sleep"]))/max_score) * 100
+
+
+default_health = {
+            "heart_rate": random.randint(70, 90),
+            "temperature": random.randint(24, 30),
+            "hydration": random.randint(500, 1500),
+            "max_speed": random.randint(8, 10),
+            "stress": random.randint(80, 90),
+            "muscle_mass": random.randint(12, 25),
+            "body_fat": random.randint(3, 14),
+            "sleep": random.randint(1, 24)
+        }
+soldier1 = Soldier("Abraham Mathew", "MiddleEast-2024-TRAIN", [51.877234, -3.435486], default_health, [""], False)
+soldier2 = Soldier("Kevin Thomas", "MiddleEast-2024-TRAIN", [51.887223, -3.451453], default_health, [""], True)
+soldier3 = Soldier("Neil McGoode", "MiddleEast-2024-TRAIN", [51.98233, -3.451453], default_health, [""], False)
+soldier4 = Soldier("John Yu", "MiddleEast-2024-TRAIN", [51.887223, -3.42], default_health, [""], False)
+soldiers_data = [soldier1, soldier2, soldier3, soldier4]
 
 # Personel Dashboard
 
 # Polled and viewed statically afterwards
 @app.get('/analytics') # {soldier_id}
 async def analytics(): # soldier_id: str
-    print(soldiers_data['john'])
-    return {
-        "overall_score": soldiers_data["john"]["health"]["overall_score"],
-        "hydration": soldiers_data["john"]["health"]["hydration"],
-        "muscle_mass": soldiers_data["john"]["health"]["muscle_mass"],
-        "body_fat": soldiers_data["john"]["health"]["body_fat"],
-        "max_speed": soldiers_data["john"]["health"]["max_speed"],
-        "sleep": soldiers_data["john"]["health"]["sleep"],
-        "stress": soldiers_data["john"]["health"]["stress"]
-    }
+    print(soldier4.name)
+    return soldier4.health
 
 
 # Polled regularly
@@ -198,7 +200,7 @@ async def analytics(): # soldier_id: str
 async def location(lat_long: LatLong): # soldier_id: str
     # Update the soldier location
     print(lat_long.latitude, lat_long.longitude)
-    soldiers_data["john"]["location"] = [lat_long.latitude, lat_long.longitude]
+    soldier1.location = [lat_long.latitude, lat_long.longitude]
     return { 'success': 'ok' } 
 
 
@@ -206,7 +208,11 @@ async def location(lat_long: LatLong): # soldier_id: str
 
 @app.get('/soldiers')
 async def soldiers():
-    return soldiers_data
+    return [soldier1, soldier2, soldier3, soldier4]
+
+
+def process_overall_score(soldier):
+    return soldier.health["overall_score"]
 
 
 # Takes in the soldier data one by one in the queue
@@ -214,22 +220,25 @@ async def soldiers():
 def soldiers_processing():
     # Take latest info and process it
     while True:
-        soldier_update = update_queue.get()
-        print("Processing: ", soldier_update)
+        for soldier in soldiers_data:
+            if soldier.name != "John Yu":
+                soldier.health = {
+                    # "overall_score": process_overall_score(soldiers_data[soldier]),
+                    "heart_rate": str(random.randint(70, 90)),
+                    "temperature": str(random.randint(24, 30)),
+                    "hydration": str(random.randint(500, 1500)),
+                    "max_speed": str(random.randint(8, 10)),
+                    "stress": str(random.randint(80, 90))
+                }
+            else:
+                soldier.health["heart_rate"] = str(int(soldier.health["heart_rate"]) - random.randint(0, 4))
+                soldier.health["max_speed"] = str(int(soldier.health["heart_rate"]) - random.randint(0, 4))       
 
-        soldiers_data["john"] = {
-                "overall_score": "N/A",
-                "heart_rate": "N/A",
-                "temperature": "N/A", # prevent against heat-stress/temp related issues
-                "overall_score": "N/A",
-                "hydration": "N/A",
-                "muscle_mass": "N/A",
-                "body_fat": "N/A",
-                "max_speed": "N/A",
-                "sleep": "N/A",
-                "stress": "N/A"
-        }
-
+        time.sleep(2)
+        soldier.calculate_overall_score()
+                
+                # If the user is "john", then exhibit poorer performance
+                # high chance he will need support, so slowly deteriorating performance...
 
 threading.Thread(target=soldiers_processing, daemon=True).start()
 
