@@ -49,16 +49,30 @@ export default function MediaCard({ data }) {
             <Chip key={index} label={`${key}: ${value}`} variant="outlined" />
           ))}
         </Box>
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-          <img
-            width={200}
-            height={50}
-            style={{ borderRadius: "5%" }}
-            src="https://media1.tenor.com/m/c6hYp_wGVkgAAAAC/heart-lines.gif"
-            alt="Heartbeat animation"
-          />
-        </Box>
-        <Button>Send Support</Button>
+        {soldier.health["heart_rate"] > 3 ? (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+            <img
+              width={200}
+              height={50}
+              style={{ borderRadius: "5%" }}
+              src="https://media1.tenor.com/m/c6hYp_wGVkgAAAAC/heart-lines.gif"
+              alt="Heartbeat animation"
+            />
+          </Box>) : (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+            <img
+              width={200}
+              height={50}
+              style={{ borderRadius: "5%" }}
+              src="https://media1.tenor.com/m/JprGeeUV9P8AAAAC/heartbeat-black.gif"
+              alt="Flatine animation"
+            />
+          </Box>
+
+        )}
+        <br />
+        { }
+        {soldier.name == "John Yu" && soldier.health["heart_rate"] > 3 ? <Button variant="contained" color="error">Send Support</Button> : <Button variant="outlined">Send Support</Button>}
       </CardContent>
     </Card>
   );

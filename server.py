@@ -215,8 +215,8 @@ async def analytics(): # soldier_id: str
 async def location(lat_long: LatLong): # soldier_id: str
     # Update the soldier location
     print(lat_long.latitude, lat_long.longitude)
-    soldier1.location = [lat_long.latitude, lat_long.longitude]
-    return { 'success': 'ok' } 
+    soldier3.location = [lat_long.latitude, lat_long.longitude]
+    return { 'success': 'ok' }
 
 
 # Command Dashboard
@@ -252,7 +252,11 @@ def soldiers_processing():
                 if (int(soldier.health["heart_rate"]) > 4):
                     soldier.health["heart_rate"] = str(int(soldier.health["heart_rate"]) - random.randint(0, 4))
                 if (int(soldier.health["max_speed"]) > 4) :
-                    soldier.health["max_speed"] = str(int(soldier.health["heart_rate"]) - random.randint(0, 4))       
+                    soldier.health["max_speed"] = str(int(soldier.health["heart_rate"]) - random.randint(0, 4))    
+
+                soldier.location[0] += 0.00001
+                soldier.location[1] += 0.0005
+
 
         time.sleep(2)
         soldier.calculate_overall_score()

@@ -25,7 +25,6 @@ function DraggableMarker( { data }) {
   // Set the initial position to the soldier's current location
 
   const [position, setPosition] = useState({ lat: data["location"][0], lng: data["location"][1] });
-  // const [markerVal, setMarkerVal] = useState([])
   const markerRef = React.useRef(null);
 
   useEffect(() => {
@@ -33,12 +32,10 @@ function DraggableMarker( { data }) {
     console.log(data)
   }, [data])
 
-  // useEffect(() => {
-  //   const marker = markerRef.current;
-  //     if (marker != null) {
-  //       setMarkerVal(marker.getLatLng());
-  //     }
-  // }, [markerRef])
+  useEffect(() => {
+    // Update position when data changes
+    setPosition({ lat: data["location"][0], lng: data["location"][1] });
+  }, [data]);
 
   useMapEvents({
     click(e) {
@@ -67,9 +64,16 @@ function DraggableMarker( { data }) {
       eventHandlers={eventHandlers}
       position={position}
       ref={markerRef}
-      icon={soldierIcon}
+      icon={new L.Icon({
+        iconUrl: data["name"] + ".png",
+        iconSize: [50, 50], // Adjust based on your icon's size
+        shadowSize: [50, 64], // Adjust based on your shadow image's size, omit if not applicable
+        iconAnchor: [22, 94], // Adjust so the tip of the icon points to the exact location
+        shadowAnchor: [4, 62], // Adjust, omit if not applicable
+        popupAnchor: [-3, -76], // Adjust if you use popups
+      })}
     >
-      <Popup>{data["name"] + ", " + data["health"]["heart_rate"]}</Popup>
+      <Popup>{data["name"] + ", HRT: " + data["health"]["heart_rate"]}</Popup>
     </Marker>
   );
 }
@@ -78,7 +82,7 @@ function MapComponent({ soldiersData }) {
   return (
     <MapContainer
       center={[51.8833, -3.4333]}
-      zoom={13}
+      zoom={14}
       style={{ height: "600px", width: "100%" }}
     >
       <TileLayer
@@ -133,6 +137,9 @@ export default function App() {
       <div>
         <h1 style={{ fontSize: "40px" }}>Soldier Information</h1>
       </div>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+          <img src="https://image.pitchbook.com/gpg0wlSBEnoaD6MoUtCU40ZfGEI1669200872729_200x200" alt="Mission Logo" />
+        </div>
       <div
         style={{
           display: "grid",

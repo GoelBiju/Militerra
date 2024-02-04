@@ -13,6 +13,9 @@ const Dashboard = () => {
 
   return (
     <div>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <img src="mod.jpg" width="150px" height="150px" alt="Mission Logo" />
+      </div>
       <h1
         style={{
           textAlign: "center",
@@ -20,7 +23,7 @@ const Dashboard = () => {
           color: "red",
         }}
       >
-        MISSION IN PROGRESS
+        MISSION IN PROGRESS: "MiddleEast-2024-TRAIN"
       </h1>
       {/* <ul
         style={{
