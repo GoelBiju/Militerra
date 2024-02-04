@@ -21,9 +21,9 @@ const soldierIcon = new L.Icon({
   popupAnchor: [-3, -76], // Adjust if you use popups
 });
 
-function DraggableMarker(positionData) {
+function DraggableMarker( { positionData }) {
   // Set the initial position to the soldier's current location
-  const [position, setPosition] = useState(positionData); // Example coordinates
+  const [position, setPosition] = useState({ lat: positionData[0], lng: positionData[1] });
 
   useMapEvents({
     click(e) {
@@ -68,7 +68,10 @@ function MapComponent({ soldiersData }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      {/* Object.entries(a).map(([key, value]) => <DraggableMarker positionData={value[""]} />) */}
+      <DraggableMarker positionData={[51.8833, -3.4333]} />
+      <DraggableMarker positionData={[51.7392, -3.167]} />
+      <DraggableMarker positionData={[51.682, -3.093]} />
+      <DraggableMarker positionData={[51.589, -3.830]} />
     </MapContainer>
   );
 }
@@ -85,7 +88,7 @@ export default function App() {
       setIsLoading(true);
       try {
         // Use Axios to make the request
-        const response = await axios.get("http://127.0.0.1:8000/soldiers");
+        const response = await axios.get("http://127.0.0.1:8000/ui_soldiers");
         setSoldiersData(response.data); // Axios wraps the response data inside the `data` property
       } catch (error) {
         // Axios error handling
@@ -95,13 +98,13 @@ export default function App() {
       }
     };
 
-    fetchSoldiers();
+      fetchSoldiers();
   }, []);
 
   return (
     <div style={{ display: "block", textAlign: "center" }}>
       <div style={{ padding: "20px 35px" }}>
-        <MapComponent initialPosition={soldiersData} />
+        <MapComponent initialPosition={soldiersData}/>
       </div>
       <div>
         <h1 style={{ fontSize: "40px" }}>Soldier Information</h1>
@@ -124,7 +127,7 @@ export default function App() {
               <MediaCard data={soldierData} />
             </div>
           ))
-        )}
+          )}
       </div>
     </div>
   );
