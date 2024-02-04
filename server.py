@@ -1,9 +1,19 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
+from pydantic import BaseModel
 import requests
 from fastapi.middleware.cors import CORSMiddleware
 
+import threading
+import queue
+
 app = FastAPI()
+
+update_queue = queue.Queue()
+
+class LatLong(BaseModel):
+    latitude: float
+    longitude: float
 
 # replace this with the root url for your app,
 # http://127.0.0.1:8000 if you're doing it locally or
@@ -25,8 +35,6 @@ app.add_middleware(
 )
 
 NOMINATIM_API_URL = "https://nominatim.openstreetmap.org/search"
-
-
 
 @app.get("/geocode")
 def geocode(q: str):
@@ -80,10 +88,9 @@ async def auth_success(user_id: str, reference_id: str):
     )
 
     data = res.json()
-
     print(data)
-
-    return { 'user_id': user_id, 'ref': reference_id, 'data': data  }
+    return { 'user_id': user_id, 'ref': reference_id, 'data': data  
+}
 
 
 
@@ -93,6 +100,7 @@ async def auth_success(user_id: str, reference_id: str):
 # Try use ngrok to make it public and provider the url for
 # the webhook to our https://dashboard.tryterra.co/connections :)
 
+# Generic endpoint for TerraAPI consumption
 @app.post('/consume')
 async def consume(request: Request):
     data = await request.json()
@@ -101,10 +109,132 @@ async def consume(request: Request):
     # checkout https://docs.tryterra.co/reference/v2
     # to see what the data would look like.
 
-    print(data)
+    print("Adding to queue:", data)
+    # need to pick out the right data...    
+    update_queue.put(data)
 
-    return { 'success': 'ok' }
+    return { 'success': 'updated soldier' } 
 
+
+soldiers_data = {
+    "soldier-1": {
+        "name": "Abraham Mathew",
+        "mission_name": "MiddleEast-2024-TRAIN",
+        "location": [51.877234, -3.435486],
+        "health": {
+            "overall_score": "N/A",
+            "heart_rate": "N/A",
+            "temperature": "N/A", # prevent against heat-stress/temp related issues
+            "overall_score": "N/A",
+            "hydration": "N/A",
+            "muscle_mass": "N/A",
+            "body_fat": "N/A",
+            "max_speed": "N/A",
+            "sleep": "N/A",
+            "stress": "N/A"
+        },
+        "mission_commands": [""],
+        "needs_support": False
+    },
+    "soldier-2": {
+        "name": "Kevin Thomas",
+        "mission_name": "MiddleEast-2024-TRAIN",
+        "location": [51.887223, -3.451453],
+        "health": {
+            "overall_score": "N/A",
+            "heart_rate": "N/A",
+            "temperature": "N/A", # prevent against heat-stress/temp related issues
+            "overall_score": "N/A",
+            "hydration": "N/A",
+            "muscle_mass": "N/A",
+            "body_fat": "N/A",
+            "max_speed": "N/A",
+            "sleep": "N/A",
+            "stress": "N/A"
+        },
+        "mission_commands": [""],
+        "needs_support": True
+    },
+    "john": {
+        "name": "John Yu",
+        "mission_name": "MiddleEast-2024-TRAIN",
+        "location": [51.887223, -3.42],
+        "health": {
+            "overall_score": "N/A",
+            "heart_rate": "N/A",
+            "temperature": "N/A", # prevent against heat-stress/temp related issues
+            "overall_score": "N/A",
+            "hydration": "N/A",
+            "muscle_mass": "N/A",
+            "body_fat": "N/A",
+            "max_speed": "N/A",
+            "sleep": "N/A",
+            "stress": "N/A"
+        },
+        "mission_commands": [""],
+        "needs_support": False
+    },
+}
+
+# Personel Dashboard
+
+# Polled and viewed statically afterwards
+@app.get('/analytics') # {soldier_id}
+async def analytics(): # soldier_id: str
+    print(soldiers_data['john'])
+    return {
+        "overall_score": soldiers_data["john"]["health"]["overall_score"],
+        "hydration": soldiers_data["john"]["health"]["hydration"],
+        "muscle_mass": soldiers_data["john"]["health"]["muscle_mass"],
+        "body_fat": soldiers_data["john"]["health"]["body_fat"],
+        "max_speed": soldiers_data["john"]["health"]["max_speed"],
+        "sleep": soldiers_data["john"]["health"]["sleep"],
+        "stress": soldiers_data["john"]["health"]["stress"]
+    }
+
+
+# Polled regularly
+@app.post('/location') # {soldier_id}
+async def location(lat_long: LatLong): # soldier_id: str
+    # Update the soldier location
+    print(lat_long.latitude, lat_long.longitude)
+    soldiers_data["john"]["location"] = [lat_long.latitude, lat_long.longitude]
+    return { 'success': 'ok' } 
+
+
+# Command Dashboard
+
+@app.get('/soldiers')
+async def soldiers():
+    return soldiers_data
+
+
+# Takes in the soldier data one by one in the queue
+# and processes it as it is
+def soldiers_processing():
+    # Take latest info and process it
+    while True:
+        soldier_update = update_queue.get()
+        print("Processing: ", soldier_update)
+
+        soldiers_data["john"] = {
+                "overall_score": "N/A",
+                "heart_rate": "N/A",
+                "temperature": "N/A", # prevent against heat-stress/temp related issues
+                "overall_score": "N/A",
+                "hydration": "N/A",
+                "muscle_mass": "N/A",
+                "body_fat": "N/A",
+                "max_speed": "N/A",
+                "sleep": "N/A",
+                "stress": "N/A"
+        }
+
+
+threading.Thread(target=soldiers_processing, daemon=True).start()
+
+
+# 1. health metrics.. averaged compared to the group...
 
 # After your done, go to {base_url}/login to start using your
 # app.
