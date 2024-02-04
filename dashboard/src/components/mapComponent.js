@@ -68,10 +68,15 @@ function MapComponent({ soldiersData }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      <DraggableMarker positionData={[51.8833, -3.4333]} />
-      <DraggableMarker positionData={[51.7392, -3.167]} />
-      <DraggableMarker positionData={[51.682, -3.093]} />
-      <DraggableMarker positionData={[51.589, -3.830]} />
+      {/* <DraggableMarker positionData={[51.8833, -3.4333]} />
+      <DraggableMarker positionData={[51.8892, -3.437]} />
+      <DraggableMarker positionData={[51.882, -3.493]} />
+      <DraggableMarker positionData={[51.889, -3.430]} /> */}
+      {
+          Object.entries(soldiersData).map(([key, soldierData], idx) => (
+            <DraggableMarker key={key} positionData={soldierData["location"]} />
+          ))
+        }
     </MapContainer>
   );
 }
@@ -85,7 +90,7 @@ export default function App() {
 
   useEffect(() => {
     const fetchSoldiers = async () => {
-      setIsLoading(true);
+      // setIsLoading(true);
       try {
         // Use Axios to make the request
         const response = await axios.get("http://127.0.0.1:8000/ui_soldiers");
@@ -94,17 +99,19 @@ export default function App() {
         // Axios error handling
         setError(error.response ? error.response.data.message : error.message);
       } finally {
-        setIsLoading(false);
+        // setIsLoading(false);
       }
     };
 
-      fetchSoldiers();
+    let interval = setInterval(() => fetchSoldiers(), (2000))
+    //destroy interval on unmount
+    return () => clearInterval(interval)
   }, []);
 
   return (
     <div style={{ display: "block", textAlign: "center" }}>
       <div style={{ padding: "20px 35px" }}>
-        <MapComponent initialPosition={soldiersData}/>
+        <MapComponent soldiersData={soldiersData}/>
       </div>
       <div>
         <h1 style={{ fontSize: "40px" }}>Soldier Information</h1>
@@ -117,17 +124,19 @@ export default function App() {
           gap: "20px",
         }}
       >
-        {isLoading ? (
+        {/* {isLoading ? (
           <p>Loading...</p>
         ) : error ? (
           <p>Error: {error}</p>
-        ) : (
+        ) : ( */}
+        {
           Object.entries(soldiersData).map(([key, soldierData], idx) => (
             <div key={key} style={{ display: "inline-block" }}>
               <MediaCard data={soldierData} />
             </div>
           ))
-          )}
+        }
+          {/* )} */}
       </div>
     </div>
   );

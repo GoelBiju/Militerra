@@ -193,10 +193,12 @@ default_health = {
             "body_fat": random.randint(3, 14),
             "sleep": random.randint(1, 24)
         }
-soldier1 = Soldier("Abraham Mathew", "MiddleEast-2024-TRAIN", [51.877234, -3.435486], default_health, [""], False)
-soldier2 = Soldier("Kevin Thomas", "MiddleEast-2024-TRAIN", [51.887223, -3.451453], default_health, [""], True)
-soldier3 = Soldier("Neil McGoode", "MiddleEast-2024-TRAIN", [51.98233, -3.451453], default_health, [""], False)
-soldier4 = Soldier("John Yu", "MiddleEast-2024-TRAIN", [51.887223, -3.42], default_health, [""], False)
+
+
+soldier1 = Soldier("Abraham Mathew", "MiddleEast-2024-TRAIN", [51.8833, -3.4333], default_health, [""], False)
+soldier2 = Soldier("Kevin Thomas", "MiddleEast-2024-TRAIN", [51.8892, -3.437], default_health, [""], True)
+soldier3 = Soldier("Neil McGoode", "MiddleEast-2024-TRAIN", [51.882, -3.493], default_health, [""], False)
+soldier4 = Soldier("John Yu", "MiddleEast-2024-TRAIN", [51.889, -3.430], default_health, [""], False)
 soldiers_data = [soldier1, soldier2, soldier3, soldier4]
 
 # Personel Dashboard
