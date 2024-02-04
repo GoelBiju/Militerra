@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "ws": "^8.4.0",
+    "node-fetch": "^2.6.5"
+  }
+}
