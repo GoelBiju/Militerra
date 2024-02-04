@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Card, CardContent, Typography, Box, Chip } from "@mui/material";
+import { Card, CardContent, Typography, Box, Chip, Button } from "@mui/material";
 
 export default function MediaCard({ data }) {
   // Directly using `data` as it now contains a single soldier's data
@@ -24,7 +24,7 @@ export default function MediaCard({ data }) {
             objectFit: "cover",
             backgroundPosition: "top",
           }}
-          src="/18z7oia4t4eimgif.gif" // Consider updating the src to reflect the soldier's data if applicable
+          src={soldier.name + ".png"} // Consider updating the src to reflect the soldier's data if applicable
           alt={soldier.name}
         />
       </Box>
@@ -58,6 +58,7 @@ export default function MediaCard({ data }) {
             alt="Heartbeat animation"
           />
         </Box>
+        <Button>Send Support</Button>
       </CardContent>
     </Card>
   );

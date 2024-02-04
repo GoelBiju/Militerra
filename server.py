@@ -197,7 +197,7 @@ default_health = {
 
 soldier1 = Soldier("Abraham Mathew", "MiddleEast-2024-TRAIN", [51.8833, -3.4333], default_health, [""], False)
 soldier2 = Soldier("Kevin Thomas", "MiddleEast-2024-TRAIN", [51.8892, -3.437], default_health, [""], True)
-soldier3 = Soldier("Neil McGoode", "MiddleEast-2024-TRAIN", [51.882, -3.493], default_health, [""], False)
+soldier3 = Soldier("Ellie Thomas", "MiddleEast-2024-TRAIN", [51.882, -3.493], default_health, [""], False)
 soldier4 = Soldier("John Yu", "MiddleEast-2024-TRAIN", [51.889, -3.430], default_health, [""], False)
 soldiers_data = [soldier1, soldier2, soldier3, soldier4]
 
@@ -243,11 +243,16 @@ def soldiers_processing():
                     "temperature": str(random.randint(24, 30)),
                     "hydration": str(random.randint(500, 1500)),
                     "max_speed": str(random.randint(8, 10)),
-                    "stress": str(random.randint(80, 90))
+                    "stress": str(random.randint(80, 90)),
+                    "muscle_mass": random.randint(12, 25),
+                    "body_fat": random.randint(3, 14),
+                    "sleep": random.randint(1, 24)
                 }
             else:
-                soldier.health["heart_rate"] = str(int(soldier.health["heart_rate"]) - random.randint(0, 4))
-                soldier.health["max_speed"] = str(int(soldier.health["heart_rate"]) - random.randint(0, 4))       
+                if (int(soldier.health["heart_rate"]) > 4):
+                    soldier.health["heart_rate"] = str(int(soldier.health["heart_rate"]) - random.randint(0, 4))
+                if (int(soldier.health["max_speed"]) > 4) :
+                    soldier.health["max_speed"] = str(int(soldier.health["heart_rate"]) - random.randint(0, 4))       
 
         time.sleep(2)
         soldier.calculate_overall_score()

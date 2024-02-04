@@ -21,22 +21,39 @@ const soldierIcon = new L.Icon({
   popupAnchor: [-3, -76], // Adjust if you use popups
 });
 
-function DraggableMarker( { positionData }) {
+function DraggableMarker( { data }) {
   // Set the initial position to the soldier's current location
-  const [position, setPosition] = useState({ lat: positionData[0], lng: positionData[1] });
+
+  const [position, setPosition] = useState({ lat: data["location"][0], lng: data["location"][1] });
+  // const [markerVal, setMarkerVal] = useState([])
+  const markerRef = React.useRef(null);
+
+  useEffect(() => {
+    console.log("Position: ", position)
+    console.log(data)
+  }, [data])
+
+  // useEffect(() => {
+  //   const marker = markerRef.current;
+  //     if (marker != null) {
+  //       setMarkerVal(marker.getLatLng());
+  //     }
+  // }, [markerRef])
 
   useMapEvents({
     click(e) {
+      console.log(e.latlng)
       setPosition(e.latlng);
     },
   });
 
-  const markerRef = React.useRef(null);
+  
   const eventHandlers = React.useMemo(
     () => ({
       dragend() {
         const marker = markerRef.current;
         if (marker != null) {
+
           setPosition(marker.getLatLng());
         }
       },
@@ -52,7 +69,7 @@ function DraggableMarker( { positionData }) {
       ref={markerRef}
       icon={soldierIcon}
     >
-      <Popup>TERRA API INFORMATION</Popup>
+      <Popup>{data["name"] + ", " + data["health"]["heart_rate"]}</Popup>
     </Marker>
   );
 }
@@ -73,10 +90,10 @@ function MapComponent({ soldiersData }) {
       <DraggableMarker positionData={[51.882, -3.493]} />
       <DraggableMarker positionData={[51.889, -3.430]} /> */}
       {
-          Object.entries(soldiersData).map(([key, soldierData], idx) => (
-            <DraggableMarker key={key} positionData={soldierData["location"]} />
-          ))
-        }
+        Object.entries(soldiersData).map(([key, soldierData], idx) => (
+          <DraggableMarker key={key} data={soldierData} />
+        ))
+      }
     </MapContainer>
   );
 }
