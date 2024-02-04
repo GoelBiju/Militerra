@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 import requests
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
@@ -13,6 +14,28 @@ base_url = 'https://fd82-2a0c-5bc0-40-3e3a-f866-b6b3-8188-5317.ngrok-free.app'
 
 dev_id = 'militerra-testing-Zbf5Rx4BcZ'
 api_key = 'roLM-wTfZOpwjaa8hlsWPcr-W4cB0X24'
+
+# Add CORS middleware to allow requests from your frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # This is for demonstration; specify your frontend origin in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+NOMINATIM_API_URL = "https://nominatim.openstreetmap.org/search"
+
+
+
+@app.get("/geocode")
+def geocode(q: str):
+    params = {
+        "q": q,
+        "format": "json"
+    }
+    response = requests.get(NOMINATIM_API_URL, params=params)
+    return response.json()
 
 
 @app.get('/login')
