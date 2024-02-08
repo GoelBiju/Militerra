@@ -23,7 +23,7 @@ const Dashboard = () => {
           color: "red",
         }}
       >
-        MISSION IN PROGRESS: "MiddleEast-2024-TRAIN"
+        MISSION IN PROGRESS: "SouthWest-2024-TRAIN"
       </h1>
       {/* <ul
         style={{

@@ -23,7 +23,7 @@ class LatLong(BaseModel):
 # replace this with the root url for your app,
 # http://127.0.0.1:8000 if you're doing it locally or
 # use ngrok to generate a link like the one below :)
-base_url = 'https://fd82-2a0c-5bc0-40-3e3a-f866-b6b3-8188-5317.ngrok-free.app'
+base_url = 'https://4ee9-79-78-211-126.ngrok-free.app'
 # base_url = "http://127.0.0.1:8000"
 
 
@@ -45,7 +45,7 @@ NOMINATIM_API_URL = "https://nominatim.openstreetmap.org/search"
 @app.get("/ui_soldiers")
 async def get_ui_soldiers():
     # Assuming 'external_api_url' is the URL where you fetch soldier data from
-    external_api_url = "https://fd82-2a0c-5bc0-40-3e3a-f866-b6b3-8188-5317.ngrok-free.app/soldiers"
+    external_api_url = f"{base_url}/soldiers"
     async with httpx.AsyncClient() as client:
         response = await client.get(external_api_url)
         # Perform error handling as necessary
@@ -195,10 +195,10 @@ default_health = {
         }
 
 
-soldier1 = Soldier("Abraham Mathew", "MiddleEast-2024-TRAIN", [51.8833, -3.4333], default_health, [""], False)
-soldier2 = Soldier("Kevin Thomas", "MiddleEast-2024-TRAIN", [51.8892, -3.437], default_health, [""], True)
-soldier3 = Soldier("Ellie Thomas", "MiddleEast-2024-TRAIN", [51.882, -3.493], default_health, [""], False)
-soldier4 = Soldier("John Yu", "MiddleEast-2024-TRAIN", [51.889, -3.430], default_health, [""], False)
+soldier1 = Soldier("Abraham Mathew", "SouthWest-2024-TRAIN", [51.8833, -3.4333], default_health, [""], False)
+soldier2 = Soldier("Kevin Thomas", "SouthWest-2024-TRAIN", [51.8892, -3.437], default_health, [""], True)
+soldier3 = Soldier("Ellie Thomas", "SouthWest-2024-TRAIN", [51.882, -3.493], default_health, [""], False)
+soldier4 = Soldier("John Yu", "SouthWest-2024-TRAIN", [51.889, -3.430], default_health, [""], False)
 soldiers_data = [soldier1, soldier2, soldier3, soldier4]
 
 # Personel Dashboard
