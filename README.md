@@ -15,9 +15,10 @@ To run server:
 uvicorn main.app --reload
 ```
 
-
 To run soldier and commander dashboards:
 
 ```
-npm run start?
+npm run start
 ```
+
+![Militerra](screenshot.png)
